@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECG Interpretation Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="image-container">
+        <img src="Picture1.png" alt="Image 1" onerror="this.onerror=null; this.src='https://placehold.co/150x100/e0e0e0/333333?text=Image+Not+Found';">
+        <img src="Picture2.png" alt="Image 2" onerror="this.onerror=null; this.src='https://placehold.co/150x100/e0e0e0/333333?text=Image+Not+Found';">
+    </div>
+
+    <div class="form-container">
+        <div class="pagination-controls">
+            <button id="prevBtn" class="pagination-button back" onclick="changePage(-1)">Previous</button>
+            <div id="stepButtonsContainer" class="flex gap-2">
+                </div>
+            <button id="nextBtn" class="pagination-button next" onclick="changePage(1)">Next</button>
+        </div>
+
+        <div class="select-wrapper" style="margin-top: 20px; margin-bottom: 20px; text-align: center;">
+            <select id="stepDropdown" class="select-field" onchange="goToPage(parseInt(this.value))">
+                </select>
+        </div>
+
+        <div class="page" id="page1">
+            <div class="form-section">
+                <h2>Patient Information</h2>
+                <div class="field-group">
+                    <div>
+                        <label for="patientId" class="input-label">Patient ID <span class="required-asterisk">*</span></label>
+                        <input type="text" id="patientId" class="input-field" placeholder="e.g. P12345">
+                        <div id="patientIdError" class="validation-message error-message"></div>
+                    </div>
+                    <div>
+                        <label for="age" class="input-label">Age <span class="required-asterisk">*</span></label>
+                        <input type="number" id="age" class="input-field" placeholder="e.g. 55">
+                        <div id="ageRange" class="range-info"></div>
+                        <div id="ageFlag" class="flag-message"></div>
+                        <div id="ageConflict" class="conflict-message"></div>
+                        <div id="ageError" class="validation-message error-message"></div>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <div>
+                        <label for="sex" class="input-label">Sex <span class="required-asterisk">*</span></label>
+                        <div class="select-wrapper">
+                            <select id="sex" class="select-field">
+                                <option value="">Select Sex</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div id="sexError" class="validation-message error-message"></div>
+                    </div>
+                    <div>
+                        <label for="recordingDate" class="input-label">Recording Date <span class="required-asterisk">*</span></label>
+                        <input type="date" id="recordingDate" class="input-field">
+                        <div id="recordingDateConflict" class="conflict-message"></div>
+                        <div id="recordingDateError" class="validation-message error-message"></div>
+                    </div>
+                </div>
+                <div style="margin-top: 25px;">
+                    <label for="clinicalHistory" class="input-label">Brief Clinical History / Symptoms <span class="required-asterisk">*</span></label>
+                    <textarea id="clinicalHistory" class="input-field" placeholder="e.g. Chest pain, palpitations"></textarea>
+                    <div id="clinicalHistoryError" class="validation-message error-message"></div>
+                </div>
+            </div>
+            <div class="bottom-pagination-controls">
+                <button class="pagination-button back" onclick="changePage(-1)">Previous</button>
+                <button class="pagination-button next" onclick="changePage(1)">Next</button>
+            </div>
+        </div>
+
+        <div class="page" id="page2" style="display: none;">
+            <div class="form-section">
+                <h2>P Wave Abnormalities</h2>
+                <div class="field-group">
+                    <div>
+                        <label for="pWaveDuration" class="input-label">P wave duration (ms) <span class="required-asterisk">*</span></label>
+                        <input type="number" id="pWaveDuration" class="input-field" placeholder="e.g. 110">
+                        <div id="pWaveDurationRange" class="range-info"></div>
+                        <div id="pWaveDurationFlag" class="flag-message"></div>
+                        <div id="pWaveDurationError" class="validation-message error-message"></div>
+                    </div>
+                    <div>
+                        <label for="pWaveShape" class="input-label">P wave shape <span class="required-asterisk">*</span></label>
+                        <div class="select-wrapper">
+                            <select id="pWaveShape" class="select-field">
+                                <option value="">Select</option>
+                                <option value="Normal">Normal</option>
+                                <option value="Peaked">Peaked</option>
+                                <option value="Bifid">Bifid</option>
+                                <option value="Absent">Absent</option>
+                                <option value="Sawtooth">Sawtooth</option>
+                            </select>
+                        </div>
+                        <div id="pWaveShapeError" class="validation-message error-message"></div>
+                    </div>
+                </div>
+                <div style="margin-top: 25px;">
+                    <label for="atrialEnlargement" class="input-label">Atrial enlargement <span class="required-asterisk">*</span></label>
+                    <div class="select-wrapper">
+                        <select id="atrialEnlargement" class="select-field">
+                            <option value="">Select</option>
+                            <option value="None">None</option>
+                            <option value="Left Atrial Enlargement">Left Atrial Enlargement</option>
+                            <option value="Right Atrial Enlargement">Right Atrial Enlargement</option>
+                        </select>
+                    </div>
+                    <div id="atrialEnlargementError" class="validation-message error-message"></div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>PR Interval</h2>
+                <div class="field-group">
+                    <div>
+                        <label for="prInterval" class="input-label">PR interval (ms) <span class="required-asterisk">*</span></label>
+                        <input type="number" id="prInterval" class="input-field" placeholder="e.g. 160">
+                        <div id="prIntervalRange" class="range-info"></div>
+                        <div id="prIntervalFlag" class="flag-message"></div>
+                        <div id="prIntervalError" class="validation-message error-message"></div>
+                    </div>
+                    <div>
+                        <label for="avBlockType" class="input-label">AV Block Type <span class="required-asterisk">*</span></label>
+                        <div class="select-wrapper">
+                            <select id="avBlockType" class="select-field">
+                                <option value="">Select</option>
+                                <option value="None">None</option>
+                                <option value="Mobitz I (Wenckebach)">Mobitz I (Wenckebach)</option>
+                                <option value="Mobitz II">Mobitz II</option>
+                                <option value="3rd Degree">3rd Degree</option>
+                            </select>
+                        </div>
+                        <div id="avBlockTypeError" class="validation-message error-message"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="bottom-pagination-controls">
+                <button class="pagination-button back" onclick="changePage(-1)">Previous</button>
+                <button class="pagination-button next" onclick="changePage(1)">Next</button>
+            </div>
+        </div>
+
+        <div class="page" id="page3" style="display: none;">
+            <div class="form-section">
+                <h2>QRS Complex</h2>
+                <div class="field-group">
+                    <div>
+                        <label for="qrsDuration" class="input-label">QRS duration (ms) <span class="required-asterisk">*</span></label>
+                        <input type="number" id="qrsDuration" class="input-field" placeholder="e.g. 130">
+                        <div id="qrsDurationRange" class="range-info"></div>
+                        <div id="qrsDurationFlag" class="flag-message"></div>
+                        <div id="qrsDurationError" class="validation-message error-message"></div>
+                    </div>
+                    <div>
+                        <label for="qrsMorphology" class="input-label">QRS morphology <span class="required-asterisk">*</span></label>
+                        <div class="select-wrapper">
+                            <select id="qrsMorphology" class="select-field">
+                                <option value="">Select</option>
+                                <option value="Normal">Normal</option>
+                                <option value="RBBB">RBBB</option>
+                                <option value="LBBB">LBBB</option>
+                                <option value="Delta wave">Delta wave</option>
+                                <option value="Notching/Slurring">Notching/Slurring</option>
+                            </select>
+                        </div>
+                        <div id="qrsMorphologyError" class="validation-message error-message"></div>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <div>
+                        <label for="qrsVoltage" class="input-label">QRS voltage <span class="required-asterisk">*</span></label>
+                        <div class="select-wrapper">
+                            <select id="qrsVoltage" class="select-field">
+                                <option value="">Select</option>
+                                <option value="Normal">Normal</option>
+                                <option value="Low voltage">Low voltage</option>
+                                <option value="Electrical alternans">Electrical alternans</option>
+                            </select>
+                        </div>
+                        <div id="qrsVoltageError" class="validation-message error-message"></div>
+                    </div>
+                    <div>
+                        <label for="rWaveProgression" class="input-label">R wave progression <span class="required-asterisk">*</span></label>
+                        <div class="select-wrapper">
+                            <select id="rWaveProgression" class="select-field">
+                                <option value="">Select</option>
+                                <option value="Normal">Normal</option>
+                                <option value="Poor">Poor</option>
+                                <option value="Reverse">Reverse</option>
+                            </select>
+                        </div>
+                        <div id="rWaveProgressionError" class="validation-message error-message"></div>
+                    </div>
+                </div>
+                <div class="checkbox-group" style="margin-top: 25px;">
+                    <label class="checkbox-label" for="rsRatioAbnormal">
+                        <input type="checkbox" id="rsRatioAbnormal" name="qrsComplexChecks"> Precordial leads R/S ratio abnormal
+                    </label>
+                    <label class="checkbox-label" for="pathologicQWaves">
+                        <input type="checkbox" id="pathologicQWaves" name="qrsComplexChecks"> Pathologic Q waves Present
+                    </label>
+                </div>
+            </div>
+            <div class="bottom-pagination-controls">
+                <button class="pagination-button back" onclick="changePage(-1)">Previous</button>
+                <button class="pagination-button next" onclick="changePage(1)">Next</button>
+            </div>
+        </div>
+
+        <div class="page" id="page4" style="display: none;">
+            <div class="form-section">
+                <h2>QT Interval</h2>
+                <div class="field-group">
+                    <div>
+                        <label for="qtcInterval" class="input-label">QTc interval (ms) <span class="required-asterisk">*</span></label>
+                        <input type="number" id="qtcInterval" class="input-field" placeholder="Auto-corrected QT interval">
+                        <div id="qtcIntervalRange" class="range-info"></div>
+                        <div id="qtcIntervalFlag" class="flag-message"></div>
+                        <div id="qtcIntervalError" class="validation-message error-message"></div>
+                    </div>
+                    <div>
+                        <label for="qtAbnormality" class="input-label">QT abnormality <span class="required-asterisk">*</span></label>
+                        <div class="select-wrapper">
+                            <select id="qtAbnormality" class="select-field">
+                                <option value="">Select</option>
+                                <option value="Normal">Normal</option>
+                                <option value="Prolonged">Prolonged</option>
+                                <option value="Shortened">Shortened</option>
+                                <option value="Torsades de Pointes">Torsades de Pointes</option>
+                            </select>
+                        </div>
+                        <div id="qtAbnormalityError" class="validation-message error-message"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-section">
+                <h2>Axis Deviation</h2>
+                <div style="margin-top: 0;">
+                    <label for="qrsAxis" class="input-label">QRS Axis <span class="required-asterisk">*</span></label>
+                    <div class="select-wrapper">
+                        <select id="qrsAxis" class="select-field">
+                            <option value="">Select</option>
+                            <option value="Normal">Normal</option>
+                            <option value="Left Axis Deviation">Left Axis Deviation</option>
+                            <option value="Right Axis Deviation">Right Axis Deviation</option>
+                            <option value="Extreme Axis">Extreme Axis</option>
+                        </select>
+                    </div>
+                    <div id="qrsAxisError" class="validation-message error-message"></div>
+                </div>
+            </div>
+            <div class="bottom-pagination-controls">
+                <button class="pagination-button back" onclick="changePage(-1)">Previous</button>
+                <button class="pagination-button next" onclick="changePage(1)">Next</button>
+            </div>
+        </div>
+
+        <div class="page" id="page5" style="display: none;">
+            <div class="form-section">
+                <h2>ST Segment Abnormalities <span class="required-asterisk">*</span></h2>
+                <div class="checkbox-group" id="stSegmentAbnormalitiesGroup">
+                    <label class="checkbox-label" for="stElevation">
+                        <input type="checkbox" id="stElevation" name="stSegmentStatus" value="elevation"> ST elevation Present
+                    </label>
+                    <label class="checkbox-label" for="stDepression">
+                        <input type="checkbox" id="stDepression" name="stSegmentStatus" value="depression"> ST depression Present
+                    </label>
+                    <label class="checkbox-label" for="stNormal">
+                        <input type="checkbox" id="stNormal" name="stSegmentStatus" value="normal"> ST segment Normal
+                    </label>
+                    <label class="checkbox-label" for="earlyRepolarization">
+                        <input type="checkbox" id="earlyRepolarization" name="stSegmentStatus" value="earlyRepolarization"> Early repolarization Present
+                    </label>
+                    <label class="checkbox-label" for="osbornJWaves">
+                        <input type="checkbox" id="osbornJWaves" name="stSegmentStatus" value="osbornJWaves"> Osborn (J) waves Present
+                    </label>
+                    <label class="checkbox-label" for="nonspecificSTTChanges">
+                        <input type="checkbox" id="nonspecificSTTChanges" name="stSegmentStatus" value="nonspecific"> Non-specific ST/T changes Present
+                    </label>
+                </div>
+                <div id="stSegmentStatusesError" class="validation-message error-message"></div>
+            </div>
+            <div class="form-section">
+                <h2>T and U Waves</h2>
+                <div class="field-group">
+                    <div>
+                        <label for="tWaveAbnormalities" class="input-label">T wave abnormalities <span class="required-asterisk">*</span></label>
+                        <div class="select-wrapper">
+                            <select id="tWaveAbnormalities" class="select-field">
+                                <option value="">Select</option>
+                                <option value="Normal">Normal</option>
+                                <option value="Inverted">Inverted</option>
+                                <option value="Tall">Tall</option>
+                                <option value="Hyperacute">Hyperacute</option>
+                            </select>
+                        </div>
+                        <div id="tWaveAbnormalitiesError" class="validation-message error-message"></div>
+                    </div>
+                    <div></div>
+                </div>
+                <div class="checkbox-group" style="margin-top: 25px;">
+                    <label class="checkbox-label" for="uWaveProminence">
+                        <input type="checkbox" id="uWaveProminence" name="tuWaveChecks"> U wave prominence Present
+                    </label>
+                </div>
+            </div>
+            <div class="bottom-pagination-controls">
+                <button class="pagination-button back" onclick="changePage(-1)">Previous</button>
+                <button class="pagination-button next" onclick="changePage(1)">Next</button>
+            </div>
+        </div>
+
+        <div class="page" id="page6" style="display: none;">
+            <div class="form-section">
+                <h2>Rhythm and Rate</h2>
+                <div class="field-group">
+                    <div>
+                        <label for="heartRate" class="input-label">Heart rate (bpm) <span class="required-asterisk">*</span></label>
+                        <input type="number" id="heartRate" class="input-field" placeholder="e.g. 75">
+                        <div id="heartRateRange" class="range-info"></div>
+                        <div id="heartRateFlag" class="flag-message"></div>
+                        <div id="heartRateError" class="validation-message error-message"></div>
+                    </div>
+                    <div>
+                        <label for="rhythm" class="input-label">Rhythm <span class="required-asterisk">*</span></label>
+                        <div class="select-wrapper">
+                            <select id="rhythm" class="select-field">
+                                <option value="">Select</option>
+                                <option value="Sinus rhythm">Sinus rhythm</option>
+                                <option value="Sinus bradycardia">Sinus bradycardia</option>
+                                <option value="Sinus tachycardia">Sinus tachycardia</option>
+                                <option value="Atrial fibrillation">Atrial fibrillation</option>
+                                <option value="Atrial flutter">Atrial flutter</option>
+                                <option value="Supraventricular tachycardia">Supraventricular tachycardia</option>
+                                <option value="Ventricular tachycardia">Ventricular tachycardia</option>
+                                <option value="Ventricular fibrillation">Ventricular fibrillation</option>
+                                <option value="Junctional rhythm">Junctional rhythm</option>
+                                <option value="Idioventricular rhythm">Idioventricular rhythm</option>
+                                <option value="Asystole">Asystole</option>
+                            </select>
+                        </div>
+                        <div id="rhythmError" class="validation-message error-message"></div>
+                    </div>
+                </div>
+                <div class="checkbox-group" style="margin-top: 25px;">
+                    <label class="checkbox-label" for="pacemakerPresent">
+                        <input type="checkbox" id="pacemakerPresent" name="rhythmChecks"> Pacemaker present
+                    </label>
+                    <label class="checkbox-label" for="ectopicBeats">
+                        <input type="checkbox" id="ectopicBeats" name="rhythmChecks"> Ectopic beats Present
+                    </label>
+                </div>
+            </div>
+            <div class="bottom-pagination-controls">
+                <button class="pagination-button back" onclick="changePage(-1)">Previous</button>
+                <button class="pagination-button next" onclick="changePage(1)">Next</button>
+            </div>
+        </div>
+
+        <div class="page" id="page7" style="display: none;">
+            <div class="form-section">
+                <h2>Analysis and Actions</h2>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button id="analyzeBtn" onclick="analyzeECG()">Analyze ECG</button>
+                    <button id="exportExcelBtn" onclick="exportToCSV()" style="margin-left: 20px;">Export to CSV</button>
+                </div>
+                <div id="analysisMessages"></div>
+            </div>
+
+            <div id="analysisResults" class="form-section" style="display: none;">
+                <h2>Analysis Results</h2>
+                <div id="analysisSummary"></div>
+
+                <h3>Rule Checks (OK):</h3>
+                <button id="toggleOkRulesBtn" style="display: none;">Show Rules Met</button>
+                <div id="okRulesListContainer">
+                    </div>
+
+                <div id="notOkRulesSection" style="display: none;">
+                    <h3>Rules Not Met:</h3>
+                    <ul id="notOkRulesList" class="not-ok-rules-list"></ul>
+                </div>
+                <button id="toggleNotOkRulesBtn" style="display: none; margin-top: 15px;">Show Rules Not Met</button>
+            </div>
+
+            <div id="firstInterpreterSection" class="form-section" style="display: none;">
+                <h2>First Interpreter</h2>
+                <button id="toggleFirstInterpreterBtn" style="display: none;">Show First Interpretations</button>
+                <div id="firstInterpretationListContainer">
+                    <ul id="firstInterpretationList" class="not-ok-rules-list"></ul>
+                </div>
+            </div>
+
+            <div id="deepInterpreterSection" class="form-section" style="display: none;">
+                <h2>Deep Interpreter (AI Analysis)</h2>
+                <div id="deepInterpretationContent">
+                    <p>فیلدهای بالا را پر کنید تا تحلیل عمیق ECG توسط هوش مصنوعی تولید شود.</p>
+                    <button id="generateDeepInterpretationBtn" class="pagination-button next mt-4" onclick="generateDeepInterpretation()">Generate Deep Interpretation</button>
+                </div>
+            </div>
+
+            <div class="bottom-pagination-controls">
+                <button class="pagination-button back" onclick="changePage(-1)">Previous</button>
+            </div>
+            <canvas id="wavyCanvas7" class="wavy-canvas"></canvas>
+        </div>
+
+    </div>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="hideModal()">&times;</span>
+            <div id="modalMessage"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
