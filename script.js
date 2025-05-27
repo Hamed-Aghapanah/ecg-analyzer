@@ -578,7 +578,7 @@ function validateCurrentPageAndSetStatus() {
                         }
                         const errorDiv = document.getElementById(fieldId + 'Error');
                         if (errorDiv) {
-                            errorDiv.textContent = 'حداقل یک گزینه باید انتخاب شود.';
+                            errorDiv.textContent = 'این فیلد اجباری است.'; // Changed message for checkbox/radio group
                             errorDiv.style.display = 'block';
                         }
                     } else {
@@ -860,12 +860,14 @@ function analyzeECG() {
 
     // Validate ALL pages before analysis
     const allPagesValidationIssues = [];
+    let hasCriticalErrors = false; // Initialize here
     for (let i = 1; i <= totalPages; i++) {
         const tempCurrentPage = currentPage; // Store current page
         currentPage = i; // Temporarily set page to validate
         const validationResult = validateCurrentPageAndSetStatus();
         if (validationResult.hasErrors) {
             allPagesValidationIssues.push({ type: 'error', message: `Step ${i}: ${pageNames[i]} دارای خطا است.`, errors: validationResult.errors });
+            hasCriticalErrors = true; // Set to true if any error is found
         } else if (validationResult.hasWarnings) {
             allPagesValidationIssues.push({ type: 'warning', message: `Step ${i}: ${pageNames[i]} دارای هشدار است.`, warnings: validationResult.warnings });
         }
@@ -873,12 +875,12 @@ function analyzeECG() {
     }
     updateStepButtons(); // Ensure step buttons reflect all statuses
 
+    // Display all issues found (errors and warnings)
     if (allPagesValidationIssues.length > 0) {
         const analysisMessagesDiv = document.getElementById('analysisMessages');
         const ul = document.createElement('ul');
         ul.classList.add('error-list');
 
-        let hasCriticalErrors = false;
         allPagesValidationIssues.forEach(issue => {
             const li = document.createElement('li');
             li.classList.add(issue.type);
@@ -895,23 +897,24 @@ function analyzeECG() {
                 li.appendChild(subUl);
             }
             ul.appendChild(li);
-            if (issue.type === 'error') hasCriticalErrors = true;
         });
         analysisMessagesDiv.appendChild(ul);
+    }
 
+    // Now, decide whether to proceed with analysis based on hasCriticalErrors
+    if (hasCriticalErrors) {
+        showModal('<strong>تحلیل ECG به دلیل وجود خطا در فرم انجام نشد. لطفاً خطاهای مشخص شده را برطرف کنید.</strong>');
+        // Re-enable buttons and remove spinner as analysis is aborted
         analyzeBtn.disabled = false;
         exportExcelBtn.disabled = false;
         deepInterpreterBtn.disabled = false;
         analyzeBtn.textContent = 'Analyze ECG';
         spinner.remove();
         if (wavyCanvas) wavyCanvas.style.display = 'none';
-
-        if (hasCriticalErrors) {
-            showModal('<strong>تحلیل ECG به دلیل وجود خطا در فرم انجام نشد. لطفاً خطاهای مشخص شده را برطرف کنید.</strong>');
-        } else {
-            showModal('<strong>تحلیل ECG با هشدارهایی انجام شد. لطفاً هشدارهای مشخص شده را بررسی کنید.</strong>');
-        }
-        return;
+        return; // Abort analysis due to errors
+    } else if (allPagesValidationIssues.length > 0) { // Only warnings exist
+        showModal('<strong>تحلیل ECG با هشدارهایی انجام شد. لطفاً هشدارهای مشخص شده را بررسی کنید.</strong>');
+        // Do NOT return; proceed with analysis
     }
 
     const formData = {
@@ -1134,13 +1137,13 @@ function analyzeECG() {
     if (notOkRulesListArray.length > 0) {
         notOkRulesSection.style.display = 'block';
         toggleNotOkRulesBtn.style.display = 'block';
-        toggleNotOkRulesBtn.textContent = `Hide Rules Not Met (${notOkRulesListArray.length})`;
+        toggleNotOkRulesBtn.textContent = `Show Rules Not Met (${notOkRulesListArray.length})`; // Changed to "Show" by default
+        notOkRulesListUl.style.display = 'none'; // Initially hidden
         notOkRulesListArray.forEach(rule => {
             const li = document.createElement('li');
             li.textContent = rule;
             notOkRulesListUl.appendChild(li);
         });
-        notOkRulesListUl.style.display = 'block';
     } else {
         notOkRulesSection.style.display = 'none';
         toggleNotOkRulesBtn.style.display = 'none';
@@ -1182,7 +1185,7 @@ function toggleNotOkRulesSection() {
 
     if (notOkRulesListUl.style.display === 'none') {
         notOkRulesListUl.style.display = 'block';
-        toggleBtn.textContent = 'Hide Rules Not Met';
+        toggleBtn.textContent = `Hide Rules Not Met (${notOkRulesListUl.children.length})`;
     } else {
         notOkRulesListUl.style.display = 'none';
         toggleBtn.textContent = `Show Rules Not Met (${notOkRulesListUl.children.length})`;
@@ -1521,12 +1524,12 @@ function firstInterpretECG(formData) {
         firstInterpreterSection.style.display = 'block';
         toggleFirstInterpreterBtn.style.display = 'block';
         toggleFirstInterpreterBtn.textContent = `Hide First Interpretations (${firstInterpretationResults.length})`;
+        firstInterpretationListUl.style.display = 'block';
         firstInterpretationResults.forEach(interpretation => {
             const li = document.createElement('li');
             li.innerHTML = interpretation;
             firstInterpretationListUl.appendChild(li);
         });
-        firstInterpretationListUl.style.display = 'block';
     } else {
         firstInterpreterSection.style.display = 'none';
         toggleFirstInterpreterBtn.style.display = 'none';

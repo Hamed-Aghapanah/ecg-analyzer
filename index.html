@@ -73,7 +73,7 @@
                 </div>
             </div>
             <div class="bottom-pagination-controls">
-                <button class="pagination-button back" onclick="changePage(-1)">Previous</button>
+                <button id="clearDataBtn" class="pagination-button back" onclick="resetForm()">پاک کردن اطلاعات</button>
                 <button class="pagination-button next" onclick="changePage(1)">Next</button>
             </div>
         </div>
@@ -251,7 +251,7 @@
                             <option value="">Select</option>
                             <option value="Normal">Normal</option>
                             <option value="Left Axis Deviation">Left Axis Deviation</option>
-                            <option value="Right Axis Deviation">Right Axis Deviation</option>
+                            <option value="Right Axis Deviation">Right Axis Deviation</m>
                             <option value="Extreme Axis">Extreme Axis</option>
                         </select>
                     </div>
@@ -385,7 +385,7 @@
                 <div id="okRulesListContainer">
                     </div>
 
-                <div id="notOkRulesSection" style="display: none;">
+                <div id="notOkRulesSection" class="form-section" style="display: none;">
                     <h3>Rules Not Met:</h3>
                     <ul id="notOkRulesList" class="not-ok-rules-list"></ul>
                 </div>
